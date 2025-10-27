@@ -482,3 +482,4 @@ Se quiser, eu faço agora:
 * Gerar também os arquivos de testes convertidos para CommonJS caso prefira evitar ESM issues.
 
 Qual dessas ações deseja que eu faça agora? (Posso já criar o ZIP com os arquivos prontos pra você baixar — não precisa me esperar: eu gero agora.)
+
