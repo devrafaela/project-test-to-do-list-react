@@ -1,3 +1,4 @@
+// src/App.jsx
 import { useState, useEffect } from "react";
 import "./App.css";
 import ToDo from "./components/ToDo";
@@ -5,8 +6,15 @@ import ToDoForm from "./components/ToDoForm";
 import Search from "./components/Search";
 import Filter from "./components/Filter";
 
+// Mudança: importação de funções de serviço para lógica de todo
+import {
+  addTodo as addTodoService,
+  removeTodo as removeTodoService,
+  completeTodo as completeTodoService,
+  filterAndSortTodos,
+} from "./utils/todoService";
+
 function App() {
-  // Inicializa os todos a partir do localStorage, ou com os padrões
   const [todos, setTodos] = useState(() => {
     const saved = localStorage.getItem("todos");
     return saved
@@ -21,36 +29,37 @@ function App() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [sort, setSort] = useState("Asc");
-  const [theme, setTheme] = useState("day"); // tema inicial
+  const [theme, setTheme] = useState("day");
 
-  // Atualiza a classe do body
   useEffect(() => {
-    document.body.className = theme;
+    document.body.className = theme; // Mantido igual: troca de tema
   }, [theme]);
 
-  // Salva os todos no localStorage sempre que mudarem
   useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
+    localStorage.setItem("todos", JSON.stringify(todos)); // Mantido igual: salva no localStorage
   }, [todos]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "day" ? "night" : "day"));
+    setTheme((prev) => (prev === "day" ? "night" : "day")); // Mantido igual
   };
 
+  // Refatorado: lógica de addTodo movida para addTodoService
   const addTodo = (text, category) => {
-    const newTodos = [...todos, { id: Math.floor(Math.random() * 10000), text, category, isCompleted: false }];
+    const newTodos = addTodoService(todos, { text, category }, () => Math.floor(Math.random() * 10000));
     setTodos(newTodos);
   };
 
+  // Refatorado: lógica de remover todo movida para removeTodoService
   const removeToDo = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+    setTodos(removeTodoService(todos, id));
   };
 
+  // Refatorado: lógica de completar todo movida para completeTodoService
   const completeToDo = (id) => {
-    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo)));
+    setTodos(completeTodoService(todos, id));
   };
 
-  // Gera 100 estrelas
+  // Fundo com estrelas: mantido igual
   const stars = Array.from({ length: 100 }, (_, i) => {
     const size = Math.random() * 3 + 1;
     const top = Math.random() * 100;
@@ -72,11 +81,11 @@ function App() {
     );
   });
 
-  // Gera 10 nuvens aleatórias (apenas no tema dia)
+  // Nuvens: mantido igual
   const clouds =
     theme === "day"
       ? Array.from({ length: 10 }, (_, i) => {
-          const size = Math.random() * 100 + 50; // largura
+          const size = Math.random() * 100 + 50;
           const top = Math.random() * 60;
           const left = Math.random() * 100;
           const duration = Math.random() * 30 + 20;
@@ -98,7 +107,6 @@ function App() {
 
   return (
     <>
-      {/* Fundo */}
       <div className="stars">
         {theme === "night" && stars}
         {theme === "night" && (
@@ -114,7 +122,6 @@ function App() {
         {clouds}
       </div>
 
-      {/* App */}
       <div className="app">
         <div className="title-container">
           <h1>To Do List</h1>
@@ -127,29 +134,23 @@ function App() {
         <Filter filter={filter} setFilter={setFilter} setSort={setSort} />
 
         <div className="todo-list">
-          {todos
-            .filter((todo) =>
-              filter === "All" ? true : filter === "Completed" ? todo.isCompleted : !todo.isCompleted
-            )
-            .filter((todo) => todo.text.toLowerCase().includes(search.toLowerCase()))
-            .sort((a, b) => (sort === "Asc" ? a.text.localeCompare(b.text) : b.text.localeCompare(a.text)))
-            .map((todo) => (
-              <ToDo key={todo.id} todo={todo} removeToDo={removeToDo} completeToDo={completeToDo} />
-            ))}
+          {/* Refatorado: filtro e ordenação movidos para filterAndSortTodos */}
+          {filterAndSortTodos(todos, { filter, search, sort }).map((todo) => (
+            <ToDo key={todo.id} todo={todo} removeToDo={removeToDo} completeToDo={completeToDo} />
+          ))}
         </div>
 
         <ToDoForm addTodo={addTodo} />
       </div>
 
-      {/* Créditos logo abaixo do App */}
-      <div className="creditos"> 
+      <div className="creditos">
         <b>
           <a href="https://github.com/devrafaela" target="_blank" rel="noopener noreferrer">
             Rafaela Pereira Santos
           </a>
-        </b> • baseado no tutorial de 'Matheus Battisti – Hora de Codar'
+        </b>{" "}
+        • baseado no tutorial de 'Matheus Battisti – Hora de Codar'
       </div>
-
     </>
   );
 }
