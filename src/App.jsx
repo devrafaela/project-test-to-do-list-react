@@ -149,8 +149,15 @@ function App() {
             Rafaela Pereira Santos
           </a>
         </b>{" "}
+        e{" "}
+        <b>
+          <a href="https://github.com/camillerodriguees" target="_blank" rel="noopener noreferrer">
+            Camille Rodrigues Costa
+          </a>
+        </b>{" "}
         • baseado no tutorial de 'Matheus Battisti – Hora de Codar'
       </div>
+
     </>
   );
 }
